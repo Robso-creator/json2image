@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from src.app import generate_image_pil
-from src.models import Image
+from src.api.models import Image
 from fastapi.responses import FileResponse
 from fastapi.responses import StreamingResponse
 import uuid

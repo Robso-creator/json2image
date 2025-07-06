@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.12 (json2image)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (json2image)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.13 virtualenv at ~/git/personal/json2image/venv" project-jdk-type="Python SDK" />
 </project>
