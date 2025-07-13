@@ -43,4 +43,11 @@ recreating via Json2Image. So I would be able to say that it can be used on real
 
 This Databricks post was the first one to show up:
 
-![databricks_img.png](databricks_img.png)
+
+# Comparativo
+
+# Criado via Jmage
+![img.png](img.png)
+
+# Post original
+<img src="databricks_img.png" width="300">

@@ -68,6 +68,8 @@ class MultiLineTextElement(BaseModel):
     font: str
     size: int
     color: str
+    width: int
+    line_height: Optional[int] = Field(None, alias="line-height")
     bold: Optional[Literal["True", "False"]] = "False"
     italic: Optional[Literal["True", "False"]] = "False"
 
@@ -80,7 +82,22 @@ class MultiLineTextElement(BaseModel):
             return v
         raise ValueError('Cor deve ser "white", "black" ou um código hexadecimal válido')
 
-Element = Annotated[Union[TextElement, ShapeElement, MultiLineTextElement], Field(discriminator="type")]
+
+
+class ImageElement(BaseModel):
+    type: Literal["image"]
+    position: PositionType
+    url: str
+    size: Tuple[int, int]
+    rotation: Optional[float] = 0
+
+    @validator("url")
+    def valida_url(cls, v):
+        if not v.startswith("http://") and not v.startswith("https://"):
+            raise ValueError('URL deve começar com "http://" ou "https://"')
+        return v
+
+Element = Annotated[Union[TextElement, ShapeElement, MultiLineTextElement, ImageElement], Field(discriminator="type")]
 
 class Image(BaseModel):
     h: int

@@ -2,6 +2,13 @@ from PIL import Image, ImageDraw, ImageFont
 from src.api.models import Element, PositionType
 from src.api.models import TextElement
 import math
+import requests
+from io import BytesIO
+
+
+import textwrap
+
+
 
 def rotate_point(x, y, cx, cy, angle_degrees):
     angle = math.radians(angle_degrees)
@@ -108,6 +115,68 @@ def generate_image_pil(height: int, width: int, background: str, elements: list[
 
 
                 draw.polygon(xy, fill=element.color, outline=element.border_color, width=element.border_size)
+
+        elif element.type == "multi_line_text":
+            bold = False
+            italic = False
+            if element.bold == "True":
+                bold = True
+            elif element.italic == "True":
+                italic = True
+
+            font_variation = "regular"
+            if bold and italic:
+                font_variation = "bold_italic"
+            elif bold:
+                font_variation = "bold"
+            elif italic:
+                font_variation = "italic"
+
+            font = ImageFont.truetype(f"src/{element.font}/{font_mapping[element.font][font_variation]}.ttf", element.size, encoding='unic')
+
+            if isinstance(element.position, str):
+                if element.position == "center":
+                    bbox = draw.textbbox((0, 0), element.value, font=font)
+                    text_width = bbox[2] - bbox[0]
+                    text_height = bbox[3] - bbox[1]
+
+                    x = (img.width - text_width) // 2
+                    y = (img.height - text_height) // 2 - bbox[1]
+                    pos = (x, y)
+                elif element.position == "top-center":
+                    bbox = draw.textbbox((0, 0), element.value, font=font)
+                    text_width = bbox[2] - bbox[0]
+
+                    x = (img.width - text_width) // 2
+                    y = 15 - bbox[1]
+                    pos = (x, y)
+                elif element.position == "bottom-center":
+                    bbox = draw.textbbox((0, 0), element.value, font=font)
+                    text_width = bbox[2] - bbox[0]
+                    text_height = bbox[3] - bbox[1]
+
+                    x = (img.width - text_width) // 2
+                    y = img.height - text_height - bbox[1] - 10
+                    pos = (x, y)
+            else:
+                pos = element.position
+            lines = textwrap.wrap(element.value, width=element.width)
+            y_text = pos[1]
+            for line in lines:
+                height = element.size
+                if element.line_height:
+                    height = element.line_height
+                draw.text((pos[0], y_text), line, font=font, fill=element.color)
+                y_text += height
+
+        elif element.type == "image":
+            response = requests.get(element.url)
+            img_from_url = Image.open(BytesIO(response.content)).convert(
+                "RGBA")
+
+            img_from_url = img_from_url.resize(element.size)
+
+            img.paste(img_from_url, element.position, img_from_url)
 
     return img
 
